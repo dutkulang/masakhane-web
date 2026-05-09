@@ -1,7 +1,4 @@
-version: '3.6'
-
 services:
-
   server:
     # container_name: flask-api
     platform: linux/amd64
