@@ -1,5 +1,5 @@
 # base image
-FROM python:3.6.9
+FROM python:3.11-slim
 
 # set working directory 
 WORKDIR /usr/src/app
@@ -9,15 +9,32 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # install system dependencies
-RUN apt-get update && apt-get install -y netcat
-RUN apt-get update
-RUN apt-get install -y gnupg lsb-release wget
+# Recommended for Dockerfile
+RUN apt-get update -y && apt-get install -y netcat-openbsd
+RUN apt update -y
+RUN apt-get update -y && \
+    apt-get install -y \
+        wget \
+        gnupg \
+        lsb-release \
+        ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
+# Get the LSB release codename
 RUN lsb_release -c -s > /tmp/lsb_release
-RUN GCSFUSE_REPO=$(cat /tmp/lsb_release); echo "deb http://packages.cloud.google.com/apt gcsfuse-$GCSFUSE_REPO main" | tee /etc/apt/sources.list.d/gcsfuse.list
-RUN wget -O - https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 
-RUN apt-get update
+# Add GCSFuse repository with the modern key method
+RUN GCSFUSE_REPO=$(cat /tmp/lsb_release) && \
+    echo "deb [signed-by=/usr/share/keyrings/gcsfuse-archive-keyring.gpg] http://packages.cloud.google.com/apt gcsfuse-$GCSFUSE_REPO main" | tee /etc/apt/sources.list.d/gcsfuse.list && \
+    wget -O /usr/share/keyrings/gcsfuse-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+# Update and install
+RUN apt-get update -y && \
+    apt-get install -y gcsfuse && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN apt-get install -y gcsfuse
 
 
