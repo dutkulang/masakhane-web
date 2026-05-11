@@ -73,7 +73,7 @@ class MasakhaneModelLoader():
         src_bpe_path = os.path.join(model_dir, 'src.bpe.model')
         trg_bpe_path = os.path.join(model_dir, 'trg.bpe.model')
 
-        if not os.path.exists in [ckpt_path, src_vocab_path, trg_vocab_path, config_path, src_bpe_path, trg_bpe_path]:
+        if not all(os.path.exists(path) for path in [ckpt_path, src_vocab_path, trg_vocab_path, config_path, src_bpe_path, trg_bpe_path]):
             URL = "https://zenodo.org/record/7636723/files/" + \
                 src_language + "-" + tgt_language
             if domain == "":
